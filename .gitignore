@@ -1,0 +1,38 @@
+# Global ignores for all microservices
+
+# Node.js dependencies
+**/node_modules/
+
+# Spring Boot generated files
+**/target/
+**/build/
+
+# Environment configuration files
+**/.env
+**/*.properties
+**/*.yml
+**/*.yaml
+
+# Logs
+**/*.log
+**/logs/
+
+# IDE/editor-specific files
+**/.vscode/
+**/.idea/
+**/*.iml
+
+# Operating system-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+**/tmp/
+**/temp/
+
+# Coverage reports
+**/coverage/
+
+# Dependency lock files (optional)
+**/package-lock.json
+**/yarn.lock
