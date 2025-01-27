@@ -11,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
+  console.log(req);
   res.json({ status: "Hello world from pre-internship" });
 });
 
