@@ -3,6 +3,9 @@ const cors = require("cors");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const authRoutes = require("./routes/auth");
 const { authenticateToken, authorizeRole } = require("./middleware/auth");
+const sequelize = require("./config/database");
+
+const studentRoutes = require("./routes/studentRoute");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -16,6 +19,9 @@ app.use("/auth", authRoutes);
 app.get("/", (req, res) => {
   res.json({ status: "Hello world" });
 });
+
+// Routes
+app.use("/api/v1/student", studentRoutes);
 
 // Proxy middleware configuration
 const serviceOneProxy = createProxyMiddleware({
@@ -49,11 +55,35 @@ app.use(
   serviceTwoProxy
 );
 
+// Database connection verification
+async function connectDB() {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Database connected successfully.");
+  } catch (error) {
+    console.error("❌ Database connection failed:", error);
+    process.exit(1); // Exit if the database is not connected
+  }
+}
+
 // Health check endpoint
 app.get("/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
-app.listen(PORT, () => {
-  console.log(`API Gateway running on port ${PORT}`);
-});
+async function startServer() {
+  await connectDB(); // Ensure DB is connected before syncing
+
+  try {
+    await sequelize.sync({ alter: true }); // Change to `sequelize.sync({ force: true })` only for development/testing
+    console.log("✅ Database synchronized successfully.");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Unable to start server:", error);
+  }
+}
+
+startServer();
