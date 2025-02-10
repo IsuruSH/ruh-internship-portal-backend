@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const validate = require("../middleware/validate");
 
 const studentController = require("../controllers/studentController");
 
-router.get("/", studentController.getAllStudents);
+router.get("/", validate, studentController.getAllStudents);
 router.get("/:id", studentController.getStudent);
 // router.post("/", studentController.createStudent);
 router.put("/:id", studentController.updateStudent);

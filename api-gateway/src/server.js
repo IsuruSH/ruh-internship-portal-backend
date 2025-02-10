@@ -2,23 +2,34 @@ const express = require("express");
 const cors = require("cors");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const authRoutes = require("./routes/auth");
-const { authenticateToken, authorizeRole } = require("./middleware/auth");
 const sequelize = require("./config/database");
+const cookieParser = require("cookie-parser");
+const validate = require("./middleware/validate");
 
 const studentRoutes = require("./routes/studentRoute");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+require("dotenv").config();
+
 // Middleware
-app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: `${process.env.INTERNSHIP_FRONTEND_URL}`,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.use(express.json());
-app.use("/auth", authRoutes);
 
 // Auth routes (login, register)
 app.get("/", (req, res) => {
   res.json({ status: "Hello world" });
 });
+
+app.use("/auth", authRoutes);
 
 // Routes
 app.use("/api/v1/student", studentRoutes);
@@ -30,15 +41,21 @@ const serviceOneProxy = createProxyMiddleware({
   pathRewrite: {
     "^/pre-internship": "/",
   },
-});
-
-const serviceTwoProxy = createProxyMiddleware({
-  target: "http://service-two:8002",
-  changeOrigin: true,
-  pathRewrite: {
-    "^/service-two": "/",
+  onProxyReq: (proxyReq, req) => {
+    // Forward user data as headers
+    if (req.user) {
+      proxyReq.setHeader("user-email", req.user?.email);
+    }
   },
 });
+
+// const serviceTwoProxy = createProxyMiddleware({
+//   target: "http://service-two:8002",
+//   changeOrigin: true,
+//   pathRewrite: {
+//     "^/service-two": "/",
+//   },
+// });
 
 // Protected routes with role-based access
 // app.use(
@@ -47,13 +64,14 @@ const serviceTwoProxy = createProxyMiddleware({
 //   authorizeRole(["admin", "student"]),
 //   serviceOneProxy
 // );
-app.use("/pre-internship", serviceOneProxy);
-app.use(
-  "/service-two",
-  authenticateToken,
-  authorizeRole(["admin"]),
-  serviceTwoProxy
-);
+app.use("/pre-internship", validate, serviceOneProxy);
+
+// app.use(
+//   "/service-two",
+//   authenticateToken,
+//   authorizeRole(["admin"]),
+//   serviceTwoProxy
+// );
 
 // Database connection verification
 async function connectDB() {

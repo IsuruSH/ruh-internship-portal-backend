@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/database");
+const cookieParser = require("cookie-parser");
 const instructionRoutes = require("./routes/instructionRoutes");
 const internshipRoutes = require("./routes/internshipRoutes");
 
@@ -12,9 +13,11 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Test route
 app.get("/", (req, res) => {
+  console.log(req.headers["user-email"]);
   res.json({ status: "Hello world from pre-internship" });
 });
 

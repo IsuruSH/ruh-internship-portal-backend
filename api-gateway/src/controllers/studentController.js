@@ -1,7 +1,9 @@
 const Student = require("../models/Student");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 exports.getAllStudents = async (req, res) => {
+  console.log(req.user);
   try {
     const students = await Student.findAll();
     res.json(students);
@@ -73,7 +75,22 @@ exports.loginStudent = async (req, res) => {
     if (!valid) {
       return res.status(401).json({ login: false });
     }
-    res.status(200).json({ login: true });
+
+    // Generate JWT Token
+    const token = jwt.sign(
+      { id: student.student_id, email: student.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    res.cookie("token", token, {
+      // httpOnly: true,
+      // secure: process.env.NODE_ENV === "production", // Set true in production
+      sameSite: "Lax", //Allows cross-origin navigation with cookies
+      domain: "localhost", // Set the domain to localhost
+      maxAge: 3600000, // 1 hour
+    });
+
+    return res.status(200).json({ login: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
