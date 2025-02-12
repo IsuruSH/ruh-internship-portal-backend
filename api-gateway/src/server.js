@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoutes);
 
 // Routes
-app.use("/api/v1/student", studentRoutes);
+app.use("/api/v1/student", validate, studentRoutes);
 
 // Proxy middleware configuration
 const serviceOneProxy = createProxyMiddleware({

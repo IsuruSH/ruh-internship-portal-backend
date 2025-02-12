@@ -14,10 +14,13 @@ exports.getAllStudents = async (req, res) => {
 
 exports.getStudent = async (req, res) => {
   try {
-    const student = await Student.findByPk(req.params.id);
+    const student = await Student.findByPk(req.params.id, {
+      attributes: ["id", "student_id", "email", "first_login"], // Replace with the attributes you want to send
+    });
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
+
     res.json(student);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -27,11 +30,12 @@ exports.getStudent = async (req, res) => {
 exports.createStudent = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
     const student = await Student.create({
       ...req.body,
       password: hashedPassword,
     });
-    res.status(200).json(student);
+    res.status(200).json({ message: "Student created successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -39,11 +43,12 @@ exports.createStudent = async (req, res) => {
 
 exports.updateStudent = async (req, res) => {
   try {
+    console.log(req.body);
     const student = await Student.findByPk(req.params.id);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
-    await student.update(req.body);
+    await student.update({ ...req.body, first_login: false });
     res.json(student);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -78,7 +83,12 @@ exports.loginStudent = async (req, res) => {
 
     // Generate JWT Token
     const token = jwt.sign(
-      { id: student.student_id, email: student.email },
+      {
+        id: student.id,
+        email: student.email,
+        name: student.first_name,
+        student_id: student.student_id,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -90,8 +100,17 @@ exports.loginStudent = async (req, res) => {
       maxAge: 3600000, // 1 hour
     });
 
-    return res.status(200).json({ login: true });
+    return res.status(200).json({ login: true, message: "Login successful" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+exports.logoutStudent = async (req, res) => {
+  try {
+    res.clearCookie("token"); // If using cookies for auth
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
   }
 };

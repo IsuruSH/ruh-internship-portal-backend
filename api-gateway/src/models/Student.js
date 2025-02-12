@@ -19,7 +19,7 @@ const Student = sequelize.define(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      // unique: true,
     },
     first_name: {
       type: DataTypes.STRING,
@@ -41,7 +41,7 @@ const Student = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    current_gpa: {
+    gpa: {
       type: DataTypes.FLOAT,
       allowNull: true,
     },
@@ -49,6 +49,14 @@ const Student = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true,
+    },
+    profileImage: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    resultSheet: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
