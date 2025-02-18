@@ -43,7 +43,6 @@ exports.createStudent = async (req, res) => {
 
 exports.updateStudent = async (req, res) => {
   try {
-    console.log(req.body);
     const student = await Student.findByPk(req.params.id);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });

@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const validate = require("./middleware/validate");
 
 const studentRoutes = require("./routes/studentRoute");
+const adminRoutes = require("./routes/adminRoute");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -33,6 +34,7 @@ app.use("/auth", authRoutes);
 
 // Routes
 app.use("/api/v1/student", validate, studentRoutes);
+app.use("/api/v1/admin", validate, adminRoutes);
 
 // Proxy middleware configuration
 const serviceOneProxy = createProxyMiddleware({
