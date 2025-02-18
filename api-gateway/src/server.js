@@ -23,6 +23,8 @@ app.use(
     credentials: true,
   })
 );
+
+
 app.use(express.json());
 
 // Auth routes (login, register)
@@ -50,6 +52,7 @@ const serviceOneProxy = createProxyMiddleware({
     }
   },
 });
+
 
 // const serviceTwoProxy = createProxyMiddleware({
 //   target: "http://service-two:8002",

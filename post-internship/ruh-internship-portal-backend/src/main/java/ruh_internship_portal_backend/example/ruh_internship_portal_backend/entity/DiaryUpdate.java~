@@ -1,0 +1,32 @@
+package ruh_internship_portal_backend.example.ruh_internship_portal_backend.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
+
+@Table
+@Entity(name = "Diary_Update")
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class DiaryUpdate {
+    @Id
+    @Column(name = "diary_id",length = 46)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long  diary_id;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EntryType entryType;  // Daily or Weekly
+    @Column(name = "daily_date")
+    private LocalDate date;  // Used for daily entries
+    @Column(name = "week_number")
+    private Integer weekNumber;  // Used for weekly entries
+    @Version 
+    private Long version;
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+}
