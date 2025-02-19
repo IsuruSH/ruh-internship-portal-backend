@@ -24,7 +24,6 @@ app.use(
   })
 );
 
-
 app.use(express.json());
 
 // Auth routes (login, register)
@@ -53,30 +52,22 @@ const serviceOneProxy = createProxyMiddleware({
   },
 });
 
+const serviceTwoProxy = createProxyMiddleware({
+  target: "http://localhost:8080",
+  changeOrigin: true,
+  pathRewrite: {
+    "^/post-internship": "/",
+  },
+  onProxyReq: (proxyReq, req) => {
+    // Forward user data as headers
+    if (req.user) {
+      proxyReq.setHeader("user-email", req.user?.email);
+    }
+  },
+});
 
-// const serviceTwoProxy = createProxyMiddleware({
-//   target: "http://service-two:8002",
-//   changeOrigin: true,
-//   pathRewrite: {
-//     "^/service-two": "/",
-//   },
-// });
-
-// Protected routes with role-based access
-// app.use(
-//   "/pre-internship",
-//   authenticateToken,
-//   authorizeRole(["admin", "student"]),
-//   serviceOneProxy
-// );
 app.use("/pre-internship", validate, serviceOneProxy);
-
-// app.use(
-//   "/service-two",
-//   authenticateToken,
-//   authorizeRole(["admin"]),
-//   serviceTwoProxy
-// );
+app.use("/post-internship", serviceTwoProxy);
 
 // Database connection verification
 async function connectDB() {
