@@ -2,11 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/database");
 const cookieParser = require("cookie-parser");
-const instructionRoutes = require("./routes/instructionRoutes");
-const internshipRoutes = require("./routes/internshipRoutes");
+const companyRoutes = require("./routes/companyRoutes");
 
 // Import models to ensure Sequelize loads them
-require("./models/StudentPreference");
 
 const app = express();
 
@@ -22,8 +20,7 @@ app.post("/test", (req, res) => {
 });
 
 // Routes
-app.use("/api/instructions", instructionRoutes);
-app.use("/api/internships", internshipRoutes);
+app.use("/api/v1/company", companyRoutes);
 
 // Database connection verification
 async function connectDB() {

@@ -44,6 +44,7 @@ const serviceOneProxy = createProxyMiddleware({
   pathRewrite: {
     "^/pre-internship": "/",
   },
+  credentials: "include",
   onProxyReq: (proxyReq, req) => {
     // Forward user data as headers
     if (req.user) {
@@ -56,6 +57,11 @@ const serviceOneProxy = createProxyMiddleware({
       proxyReq.write(bodyData);
       proxyReq.end();
     }
+  },
+  onProxyRes: (proxyRes) => {
+    proxyRes.headers["Access-Control-Allow-Origin"] =
+      process.env.INTERNSHIP_FRONTEND_URL; // Fix CORS issue
+    proxyRes.headers["Access-Control-Allow-Credentials"] = "true"; // Allow credentials
   },
 });
 
@@ -73,7 +79,7 @@ const serviceTwoProxy = createProxyMiddleware({
   },
 });
 
-app.use("/pre-internship", serviceOneProxy);
+app.use("/pre-internship", validate, serviceOneProxy);
 app.use("/post-internship", serviceTwoProxy);
 
 // Database connection verification
