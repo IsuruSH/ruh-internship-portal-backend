@@ -84,7 +84,7 @@ exports.loginAdmin = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    res.cookie("token", token, {
+    res.cookie("adminToken", token, {
       sameSite: "Lax",
       domain: "localhost",
       maxAge: 3600000,

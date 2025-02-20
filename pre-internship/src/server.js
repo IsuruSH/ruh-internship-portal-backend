@@ -16,8 +16,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Test route
-app.get("/", (req, res) => {
-  console.log(req.headers["user-email"]);
+app.post("/test", (req, res) => {
+  console.log(req.body);
   res.json({ status: "Hello world from pre-internship" });
 });
 

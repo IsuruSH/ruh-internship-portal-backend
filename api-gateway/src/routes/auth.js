@@ -13,11 +13,19 @@ router.get("/student/verify-token", verifyToken, (req, res) => {
   res.status(200).json({ authenticated: true, user: req.user });
 });
 
-router.post("/signup/admin", adminController.createAdmin);
 router.post("/login/admin", adminController.loginAdmin);
 router.get("/admin/verify-token", verifyToken, (req, res) => {
   res.status(200).json({ authenticated: true, user: req.user });
 });
-router.post("/logout", studentController.logoutStudent);
+
+router.post("/logout", async (req, res) => {
+  try {
+    res.clearCookie("token"); // If using cookies for auth
+    res.clearCookie("adminToken"); // If using cookies
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
 
 module.exports = router;
