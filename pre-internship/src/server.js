@@ -3,6 +3,7 @@ const cors = require("cors");
 const sequelize = require("./config/database");
 const cookieParser = require("cookie-parser");
 const companyRoutes = require("./routes/companyRoutes");
+const internshipRoutes = require("./routes/internshipRoutes");
 
 // Import models to ensure Sequelize loads them
 
@@ -21,6 +22,7 @@ app.post("/test", (req, res) => {
 
 // Routes
 app.use("/api/v1/company", companyRoutes);
+app.use("/api/v1/internship", internshipRoutes);
 
 // Database connection verification
 async function connectDB() {

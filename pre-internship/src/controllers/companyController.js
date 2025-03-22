@@ -51,22 +51,19 @@ exports.deleteCompany = async (req, res) => {
       return res.status(404).json({ message: "Company not found" });
     }
     await company.destroy();
-    res.json({ message: "Company deleted successfully" });
+    res.status(200).json({ message: "Company deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.getCompanyNames = async (req, res) => {
-  console.log(req);
   try {
     const companies = await Company.findAll({
-      attributes: ["name"],
+      attributes: ["id", "name"],
     });
 
-    const companyNames = companies.map((company) => company.name);
-
-    res.json(companyNames);
+    res.status(200).json({ companies });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

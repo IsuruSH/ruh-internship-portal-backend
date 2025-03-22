@@ -1,43 +1,36 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const Admin = require("./Admin");
+const Company = require("./Company"); // Import the Company model
 
 const Internship = sequelize.define(
   "Internship",
   {
-    internship_id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    admin_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: Admin,
-        key: "admin_id",
-      },
-    },
-    company_name: {
-      type: DataTypes.STRING(100),
+    designation: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
-    position: {
-      type: DataTypes.STRING(50),
+    duration: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    time_period: {
-      type: DataTypes.STRING(50),
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+
+    companyId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Company,
+        key: "id",
+      },
     },
   },
   {
-    tableName: "Internship",
-    timestamps: true,
+    paranoid: true,
+    deletedAt: "deletedAt",
   }
 );
 
-Internship.belongsTo(Admin, { foreignKey: "admin_id" });
+// Define association: One Company has many Internships
+Company.hasMany(Internship, { foreignKey: "companyId", onDelete: "CASCADE" });
+Internship.belongsTo(Company, { foreignKey: "companyId" });
 
 module.exports = Internship;
