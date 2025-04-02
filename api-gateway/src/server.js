@@ -9,6 +9,8 @@ const Admin = require("./models/Admin");
 const bcrypt = require("bcrypt");
 
 const studentRoutes = require("./routes/studentRoute");
+const companyRoutes = require("./routes/companyRoutes");
+const internshipRoutes = require("./routes/internshipRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -24,7 +26,6 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(express.json());
 
 // Auth routes (login, register)
@@ -32,55 +33,12 @@ app.get("/", (req, res) => {
   res.json({ status: "Hello world" });
 });
 
-app.use("/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 // Routes
 app.use("/api/v1/student", validate, studentRoutes);
-
-// Proxy middleware configuration
-const serviceOneProxy = createProxyMiddleware({
-  target: "http://localhost:4001",
-  changeOrigin: true,
-  pathRewrite: {
-    "^/pre-internship": "/",
-  },
-  credentials: "include",
-  onProxyReq: (proxyReq, req) => {
-    // Forward user data as headers
-    if (req.user) {
-      proxyReq.setHeader("user-email", req.user?.email);
-    }
-    if (req.body) {
-      const bodyData = JSON.stringify(req.body);
-      proxyReq.setHeader("Content-Type", "application/json");
-      proxyReq.setHeader("Content-Length", Buffer.byteLength(bodyData));
-      proxyReq.write(bodyData);
-      proxyReq.end();
-    }
-  },
-  onProxyRes: (proxyRes) => {
-    proxyRes.headers["Access-Control-Allow-Origin"] =
-      process.env.INTERNSHIP_FRONTEND_URL; // Fix CORS issue
-    proxyRes.headers["Access-Control-Allow-Credentials"] = "true"; // Allow credentials
-  },
-});
-
-const serviceTwoProxy = createProxyMiddleware({
-  target: "http://localhost:8080",
-  changeOrigin: true,
-  pathRewrite: {
-    "^/post-internship": "/",
-  },
-  onProxyReq: (proxyReq, req) => {
-    // Forward user data as headers
-    if (req.user) {
-      proxyReq.setHeader("user-email", req.user?.email);
-    }
-  },
-});
-
-app.use("/pre-internship", validate, serviceOneProxy);
-app.use("/post-internship", serviceTwoProxy);
+app.use("/api/v1/company", companyRoutes);
+app.use("/api/v1/internship", internshipRoutes);
 
 // Database connection verification
 async function connectDB() {
