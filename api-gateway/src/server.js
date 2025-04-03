@@ -3,6 +3,7 @@ const cors = require("cors");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const authRoutes = require("./routes/auth");
 const sequelize = require("./config/database");
+require("./models"); // This will initialize all models and associations
 const cookieParser = require("cookie-parser");
 const validate = require("./middleware/validate");
 const Admin = require("./models/Admin");
@@ -11,6 +12,8 @@ const bcrypt = require("bcrypt");
 const studentRoutes = require("./routes/studentRoute");
 const companyRoutes = require("./routes/companyRoutes");
 const internshipRoutes = require("./routes/internshipRoutes");
+const preferenceFormRoutes = require("./routes/preferenceFormRoute");
+const preferenceRoutes = require("./routes/preferenceRoute");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -39,14 +42,16 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/student", validate, studentRoutes);
 app.use("/api/v1/company", companyRoutes);
 app.use("/api/v1/internship", internshipRoutes);
+app.use("/api/v1/preference-form", preferenceFormRoutes);
+app.use("/api/v1/preference", preferenceRoutes);
 
 // Database connection verification
 async function connectDB() {
   try {
-    await sequelize.authenticate();
-    console.log("✅ Database connected successfully.");
     await sequelize.sync({ alter: true }); // Change to `sequelize.sync({ force: true })` only for development/testing
     console.log("✅ Database synchronized successfully.");
+    await sequelize.authenticate();
+    console.log("✅ Database connected successfully.");
 
     const adminExists = await Admin.findOne({
       where: { email: "admin@example.com" },

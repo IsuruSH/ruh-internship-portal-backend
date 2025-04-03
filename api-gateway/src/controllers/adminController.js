@@ -72,7 +72,7 @@ exports.loginAdmin = async (req, res) => {
     }
     const valid = await bcrypt.compare(req.body.password, admin.password);
     if (!valid) {
-      return res.status(401).json({ login: false });
+      return res.status(401).json({ message: "Invalid password" });
     }
 
     const token = jwt.sign(

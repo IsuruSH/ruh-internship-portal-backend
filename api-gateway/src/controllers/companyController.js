@@ -1,4 +1,5 @@
 const Company = require("../models/Company");
+const { Op } = require("sequelize");
 
 exports.getAllCompanies = async (req, res) => {
   try {
@@ -22,7 +23,6 @@ exports.getCompany = async (req, res) => {
 };
 
 exports.createCompany = async (req, res) => {
-  console.log(req.body);
   try {
     const company = await Company.create(req.body);
     res.status(201).json({ message: "Company created successfully" });
@@ -64,6 +64,23 @@ exports.getCompanyNames = async (req, res) => {
     });
 
     res.status(200).json({ companies });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.searchCompanies = async (req, res) => {
+  try {
+    const { query } = req.query;
+    const companies = await Company.findAll({
+      where: {
+        name: {
+          [Op.iLike]: `%${query}%`,
+        },
+      },
+      limit: 10,
+    });
+    res.json(companies);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -9,5 +9,6 @@ router.put("/:id", companyController.updateCompany);
 router.delete("/:id", companyController.deleteCompany);
 
 router.get("/list/names", companyController.getCompanyNames);
+router.get("/search", companyController.searchCompanies);
 
 module.exports = router;
