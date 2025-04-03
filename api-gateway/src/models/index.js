@@ -1,55 +1,32 @@
-// Company.js
-const { DataTypes } = require("sequelize");
+// models/index.js
+const Sequelize = require("sequelize");
+const sequelize = require("../config/database");
 
-module.exports = (sequelize) => {
-  const Company = sequelize.define(
-    "Company",
-    {
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      address: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          isEmail: true,
-        },
-      },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      person: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      note: {
-        type: DataTypes.TEXT, // Changed to TEXT for longer notes
-        allowNull: true,
-      },
-    },
-    {
-      paranoid: true,
-      deletedAt: "deletedAt",
-      tableName: "Companies", // Explicit table name in plural
-    }
-  );
+// Import model functions
+const Company = require("./Company");
+const Internship = require("./Internship");
+const Preference = require("./Preference");
+const PreferenceCompany = require("./PreferenceCompany");
+const PreferenceForm = require("./PreferenceForm");
 
-  Company.associate = (models) => {
-    Company.hasMany(models.PreferenceCompany, {
-      foreignKey: "company_id",
-      as: "preferenceCompanies", // Optional: adds alias for eager loading
-    });
+// Initialize models
+const models = {
+  Company: Company(sequelize),
+  Internship: Internship(sequelize),
+  Preference: Preference(sequelize),
+  PreferenceCompany: PreferenceCompany(sequelize),
+  PreferenceForm: PreferenceForm(sequelize),
+};
 
-    // Add other associations here if needed
-    // For example, if you have Internship model:
-    // Company.hasMany(models.Internship, { foreignKey: 'company_id' });
-  };
+// Set up associations
+Object.keys(models).forEach((modelName) => {
+  if (typeof models[modelName].associate === "function") {
+    models[modelName].associate(models);
+  }
+});
 
-  return Company;
+module.exports = {
+  ...models,
+  sequelize,
+  Sequelize,
 };

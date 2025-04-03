@@ -1,4 +1,4 @@
-const Company = require("../models/Company");
+const { Company } = require("../models");
 const { Op } = require("sequelize");
 
 exports.getAllCompanies = async (req, res) => {

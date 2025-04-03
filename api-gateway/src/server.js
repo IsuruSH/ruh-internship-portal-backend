@@ -2,8 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const authRoutes = require("./routes/auth");
-const sequelize = require("./config/database");
-require("./models"); // This will initialize all models and associations
+//const sequelize = require("./config/database");
+const { sequelize } = require("./models"); // This will initialize all models and associations
 const cookieParser = require("cookie-parser");
 const validate = require("./middleware/validate");
 const Admin = require("./models/Admin");

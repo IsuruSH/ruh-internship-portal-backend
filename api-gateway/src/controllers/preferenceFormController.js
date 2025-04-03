@@ -38,14 +38,14 @@ module.exports = {
         );
       }
 
-      const createdForm = await PreferenceForm.findByPk(form.id, {
-        include: {
-          model: Preference,
-          include: [Company],
-        },
-      });
+      //   const createdForm = await PreferenceForm.findByPk(form.id, {
+      //     include: {
+      //       model: Preference,
+      //       include: [Company],
+      //     },
+      //   });
 
-      res.status(201).json(createdForm);
+      res.status(201).json({ message: "Form created successfully", form });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -269,22 +269,18 @@ module.exports = {
           (p) => p.id === selection.preferenceId
         );
         if (!preference) {
-          return res
-            .status(400)
-            .json({
-              error: `Invalid preference ID: ${selection.preferenceId}`,
-            });
+          return res.status(400).json({
+            error: `Invalid preference ID: ${selection.preferenceId}`,
+          });
         }
 
         const companyExists = preference.Companies.some(
           (c) => c.id === selection.companyId
         );
         if (!companyExists) {
-          return res
-            .status(400)
-            .json({
-              error: `Company ${selection.companyId} not available for preference ${selection.preferenceId}`,
-            });
+          return res.status(400).json({
+            error: `Company ${selection.companyId} not available for preference ${selection.preferenceId}`,
+          });
         }
       }
 

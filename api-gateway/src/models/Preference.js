@@ -27,6 +27,10 @@ module.exports = (sequelize) => {
     Preference.hasMany(models.PreferenceCompany, {
       foreignKey: "preference_id",
     });
+    Preference.hasMany(models.Internship, {
+      foreignKey: "preference_id",
+      onDelete: "CASCADE",
+    });
   };
 
   return Preference;
