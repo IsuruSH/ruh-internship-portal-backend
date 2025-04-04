@@ -38,14 +38,25 @@ module.exports = {
         );
       }
 
-      //   const createdForm = await PreferenceForm.findByPk(form.id, {
-      //     include: {
-      //       model: Preference,
-      //       include: [Company],
-      //     },
-      //   });
+      const createdForm = await PreferenceForm.findByPk(form.id, {
+        include: [
+          {
+            model: Preference,
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: Company,
+                attributes: ["id", "name"],
+                through: { attributes: [] }, // This hides the join table attributes
+              },
+            ],
+          },
+        ],
+      });
 
-      res.status(201).json({ message: "Form created successfully", form });
+      res
+        .status(201)
+        .json({ message: "Form created successfully", createdForm });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -55,10 +66,19 @@ module.exports = {
   async getAllForms(req, res) {
     try {
       const forms = await PreferenceForm.findAll({
-        include: {
-          model: Preference,
-          include: [Company],
-        },
+        include: [
+          {
+            model: Preference,
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: Company,
+                attributes: ["id", "name"],
+                through: { attributes: [] }, // This hides the join table attributes
+              },
+            ],
+          },
+        ],
       });
       res.json(forms);
     } catch (error) {
@@ -70,10 +90,19 @@ module.exports = {
   async getFormById(req, res) {
     try {
       const form = await PreferenceForm.findByPk(req.params.id, {
-        include: {
-          model: Preference,
-          include: [Company],
-        },
+        include: [
+          {
+            model: Preference,
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: Company,
+                attributes: ["id", "name"],
+                through: { attributes: [] }, // This hides the join table attributes
+              },
+            ],
+          },
+        ],
       });
       if (!form) {
         return res.status(404).json({ error: "Form not found" });

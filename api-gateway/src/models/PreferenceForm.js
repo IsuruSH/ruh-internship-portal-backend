@@ -29,6 +29,10 @@ module.exports = (sequelize) => {
       foreignKey: "form_id",
       onDelete: "CASCADE",
     });
+    PreferenceForm.hasMany(models.PreferenceCompany, {
+      foreignKey: "form_id",
+      onDelete: "CASCADE",
+    });
   };
 
   return PreferenceForm;

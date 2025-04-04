@@ -1,5 +1,4 @@
-const Internship = require("../models/Internship");
-const Company = require("../models/Company");
+const { Internship, Company } = require("../models");
 
 exports.getAllInternships = async (req, res) => {
   try {
@@ -7,6 +6,7 @@ exports.getAllInternships = async (req, res) => {
       include: {
         model: Company,
         attributes: ["name"], // Fetch only company ID and name
+        required: true,
       },
     });
     res.status(200).json({ internships });
@@ -31,7 +31,7 @@ exports.getInternship = async (req, res) => {
 
 exports.createInternship = async (req, res) => {
   try {
-    const company = await Company.findByPk(req.body.companyId);
+    const company = await Company.findByPk(req.body.company_id);
     if (!company) {
       return res.status(404).json({ error: "Company not found" });
     }

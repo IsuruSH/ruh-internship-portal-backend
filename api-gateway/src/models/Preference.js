@@ -27,9 +27,10 @@ module.exports = (sequelize) => {
     Preference.hasMany(models.PreferenceCompany, {
       foreignKey: "preference_id",
     });
-    Preference.hasMany(models.Internship, {
+    Preference.belongsToMany(models.Company, {
+      through: models.PreferenceCompany,
       foreignKey: "preference_id",
-      onDelete: "CASCADE",
+      otherKey: "company_id",
     });
   };
 

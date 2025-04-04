@@ -42,12 +42,11 @@ module.exports = (sequelize) => {
   Company.associate = (models) => {
     Company.hasMany(models.PreferenceCompany, {
       foreignKey: "company_id",
-      as: "preferenceCompanies", // Optional: adds alias for eager loading
     });
 
     Company.hasMany(models.Internship, {
-      foreignKey: "company_d",
-      as: "internships", // Optional: adds alias for eager loading
+      foreignKey: "company_id",
+
       onDelete: "CASCADE",
     });
 

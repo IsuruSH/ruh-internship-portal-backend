@@ -13,9 +13,13 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      companyId: {
+      company_id: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        references: {
+          model: "Companies", // Referencing the Companies table
+          key: "id",
+        },
+        onDelete: "CASCADE",
       },
     },
     {
@@ -27,8 +31,7 @@ module.exports = (sequelize) => {
 
   Internship.associate = (models) => {
     Internship.belongsTo(models.Company, {
-      foreignKey: "companyId",
-      as: "company", // Optional: adds alias for eager loading
+      foreignKey: "company_id",
     });
   };
 
