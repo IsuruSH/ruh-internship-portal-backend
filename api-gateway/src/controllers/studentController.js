@@ -15,7 +15,7 @@ exports.getAllStudents = async (req, res) => {
 exports.getStudent = async (req, res) => {
   try {
     const student = await Student.findByPk(req.params.id, {
-      attributes: ["id", "student_id", "email", "first_login"], // Replace with the attributes you want to send
+      attributes: ["id", "student_id", "email", "first_login", "academic_year"], // Replace with the attributes you want to send
     });
     if (!student) {
       return res.status(404).json({ message: "Student not found" });

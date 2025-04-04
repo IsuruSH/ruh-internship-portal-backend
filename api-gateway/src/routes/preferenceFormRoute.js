@@ -11,6 +11,9 @@ router.get("/:id", preferenceFormController.getFormById);
 router.put("/:id", preferenceFormController.updateForm);
 router.delete("/:id", preferenceFormController.deleteForm);
 
+// Get form by batch
+router.get("/batch/batch", preferenceFormController.getFormByBatch);
+
 // Preference management
 router.post("/:formId/preferences", preferenceFormController.addPreference);
 router.put(

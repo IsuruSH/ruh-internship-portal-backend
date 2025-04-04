@@ -153,6 +153,34 @@ module.exports = {
     }
   },
 
+  // Get form by batch
+  async getFormByBatch(req, res) {
+    try {
+      const batch = req.query.batch;
+      const forms = await PreferenceForm.findOne({
+        where: { batch: batch },
+        include: [
+          {
+            model: Preference,
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: Company,
+                attributes: ["id", "name"],
+                through: { attributes: [] }, // This hides the join table attributes
+              },
+            ],
+          },
+        ],
+      });
+      if (!forms) {
+        return res.status(404).json({ error: "Form not found" });
+      }
+      res.json({ forms });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
   // Delete form
   async deleteForm(req, res) {
     try {

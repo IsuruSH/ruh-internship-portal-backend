@@ -13,7 +13,6 @@ const studentRoutes = require("./routes/studentRoute");
 const companyRoutes = require("./routes/companyRoutes");
 const internshipRoutes = require("./routes/internshipRoutes");
 const preferenceFormRoutes = require("./routes/preferenceFormRoute");
-const preferenceRoutes = require("./routes/preferenceRoute");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -43,7 +42,6 @@ app.use("/api/v1/student", validate, studentRoutes);
 app.use("/api/v1/company", companyRoutes);
 app.use("/api/v1/internship", internshipRoutes);
 app.use("/api/v1/preference-form", preferenceFormRoutes);
-app.use("/api/v1/preference", preferenceRoutes);
 
 // Database connection verification
 async function connectDB() {
