@@ -4,6 +4,7 @@ const {
   Preference,
   PreferenceCompany,
   Company,
+  StudentPreference,
 } = require("../models");
 
 module.exports = {
@@ -316,66 +317,165 @@ module.exports = {
   // Student submits preferences
   async submitPreferences(req, res) {
     try {
-      const { studentId, selections } = req.body; // selections: [{preferenceId, companyId}]
+      const { student_id, preferences } = req.body;
       const form = await PreferenceForm.findByPk(req.params.formId);
 
       if (!form) {
         return res.status(404).json({ error: "Form not found" });
       }
 
-      // Check if deadline has passed
       if (new Date() > new Date(form.deadline)) {
-        return res
-          .status(400)
-          .json({ error: "Submission deadline has passed" });
+        return res.status(400).json({
+          error: "Submission deadline has passed",
+          deadline: form.deadline,
+        });
       }
 
-      // Validate selections
-      const preferences = await Preference.findAll({
+      // Get all valid preferences for this form
+      const formPreferences = await Preference.findAll({
         where: { form_id: form.id },
-        include: [Company],
+        include: [
+          {
+            model: Company,
+            through: { attributes: [] }, // Exclude join table attributes
+          },
+        ],
       });
 
-      // Check all preferences are covered
-      if (preferences.length !== selections.length) {
-        return res
-          .status(400)
-          .json({ error: "Must select one company for each preference" });
+      // Check if all required preferences are covered
+      if (formPreferences.length !== preferences.length) {
+        return res.status(400).json({
+          error: "Must select one company for each preference",
+          requiredPreferences: formPreferences.map((p) => ({
+            id: p.id,
+            name: p.name,
+          })),
+        });
       }
 
       // Validate each selection
-      for (const selection of selections) {
-        const preference = preferences.find(
-          (p) => p.id === selection.preferenceId
+      const invalidPreferences = [];
+      const invalidCompanies = [];
+
+      for (const selection of preferences) {
+        const validPreference = formPreferences.find(
+          (p) => p.id === selection.preference_id
         );
-        if (!preference) {
-          return res.status(400).json({
-            error: `Invalid preference ID: ${selection.preferenceId}`,
-          });
+
+        if (!validPreference) {
+          invalidPreferences.push(selection.preference_id);
+          continue;
         }
 
-        const companyExists = preference.Companies.some(
-          (c) => c.id === selection.companyId
+        const validCompany = validPreference.Companies.some(
+          (c) => c.id === selection.company_id
         );
-        if (!companyExists) {
-          return res.status(400).json({
-            error: `Company ${selection.companyId} not available for preference ${selection.preferenceId}`,
+
+        if (!validCompany) {
+          invalidCompanies.push({
+            preferenceId: selection.preference_id,
+            companyId: selection.company_id,
+            validCompanyIds: validPreference.Companies.map((c) => c.id),
           });
         }
       }
 
-      // Here you would typically save the student's selections to the database
-      // For example, create records in a StudentPreference model
-      // await StudentPreference.bulkCreate(selections.map(s => ({
-      //   student_id: studentId,
-      //   preference_id: s.preferenceId,
-      //   company_id: s.companyId,
-      //   form_id: form.id
-      // })));
+      if (invalidPreferences.length > 0 || invalidCompanies.length > 0) {
+        return res.status(400).json({
+          error: "Invalid selections",
+          ...(invalidPreferences.length > 0 && {
+            invalidPreferences,
+            validPreferenceIds: formPreferences.map((p) => p.id),
+          }),
+          ...(invalidCompanies.length > 0 && {
+            invalidCompanies,
+          }),
+        });
+      }
 
-      res.json({ message: "Preferences submitted successfully" });
+      // Delete existing submissions for this student+form combination
+      await StudentPreference.destroy({
+        where: {
+          student_fkid: student_id,
+          form_id: form.id,
+        },
+      });
+
+      // Create new submissions
+      await StudentPreference.bulkCreate(
+        preferences.map((selection) => ({
+          student_fkid: student_id,
+          form_id: form.id,
+          preference_id: selection.preference_id,
+          company_id: selection.company_id,
+          submitted_at: new Date(),
+        }))
+      );
+
+      res.status(200).json({
+        message: "Preferences submitted successfully",
+        data: {
+          formId: form.id,
+          studentId: student_id,
+          submittedAt: new Date(),
+          preferences: preferences.map((p) => ({
+            preferenceId: p.preference_id,
+            companyId: p.company_id,
+          })),
+        },
+      });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.error("Error submitting preferences:", error);
+      res.status(500).json({
+        error: "Failed to submit preferences",
+        details:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
+      });
+    }
+  },
+
+  // Add this to your form controller
+  async checkSubmission(req, res) {
+    try {
+      const { student_id, form_id } = req.query;
+
+      const studentId = parseInt(student_id);
+      const formId = parseInt(form_id);
+
+      const submission = await StudentPreference.findOne({
+        where: {
+          student_fkid: studentId,
+          form_id: formId,
+        },
+      });
+
+      if (!submission) {
+        console.log("No submission found");
+        return res.json({ submitted: false });
+      }
+
+      // Get all preferences for this submission
+      const preferences = await StudentPreference.findAll({
+        where: {
+          student_fkid: studentId,
+          form_id: formId,
+        },
+        attributes: ["preference_id", "company_id"],
+      });
+
+      res.json({
+        submitted: true,
+        preferences: preferences.map((p) => ({
+          preference_id: p.preference_id,
+          company_id: p.company_id,
+        })),
+      });
+    } catch (error) {
+      console.error("Error in checkSubmission:", error);
+      res.status(500).json({
+        error: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+      });
     }
   },
 };

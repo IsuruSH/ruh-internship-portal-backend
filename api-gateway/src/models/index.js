@@ -8,6 +8,8 @@ const Internship = require("./Internship");
 const Preference = require("./Preference");
 const PreferenceCompany = require("./PreferenceCompany");
 const PreferenceForm = require("./PreferenceForm");
+const StudentPreference = require("./StudentPreference");
+const Student = require("./Student");
 
 // Initialize models
 const models = {
@@ -16,6 +18,8 @@ const models = {
   Preference: Preference(sequelize),
   PreferenceCompany: PreferenceCompany(sequelize),
   PreferenceForm: PreferenceForm(sequelize),
+  StudentPreference: StudentPreference(sequelize),
+  Student: Student(sequelize),
 };
 
 // Set up associations

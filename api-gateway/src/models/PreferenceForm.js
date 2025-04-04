@@ -1,4 +1,3 @@
-// PreferenceForm.js
 const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
@@ -30,6 +29,10 @@ module.exports = (sequelize) => {
       onDelete: "CASCADE",
     });
     PreferenceForm.hasMany(models.PreferenceCompany, {
+      foreignKey: "form_id",
+      onDelete: "CASCADE",
+    });
+    PreferenceForm.hasMany(models.StudentPreference, {
       foreignKey: "form_id",
       onDelete: "CASCADE",
     });

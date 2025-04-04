@@ -38,4 +38,6 @@ router.delete(
 // Student submission
 router.post("/:formId/submit", preferenceFormController.submitPreferences);
 
+router.get("/submission/check", preferenceFormController.checkSubmission);
+
 module.exports = router;
