@@ -80,7 +80,7 @@ module.exports = {
           },
         ],
       });
-      res.json(forms);
+      res.json({ forms });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -116,7 +116,7 @@ module.exports = {
   // Update form
   async updateForm(req, res) {
     try {
-      const { batch, instructions, deadline } = req.body;
+      const { batch, instructions, deadline, preferences } = req.body;
       const form = await PreferenceForm.findByPk(req.params.id);
 
       if (!form) {
@@ -124,7 +124,30 @@ module.exports = {
       }
 
       await form.update({ batch, instructions, deadline });
-      res.json(form);
+
+      // Delete existing preferences
+      await Preference.destroy({ where: { form_id: form.id } });
+
+      if (preferences && preferences.length > 0) {
+        await Promise.all(
+          preferences.map(async (pref) => {
+            const preference = await Preference.create({
+              form_id: form.id,
+              name: pref.name,
+            });
+
+            if (pref.companies && pref.companies.length > 0) {
+              await PreferenceCompany.bulkCreate(
+                pref.companies.map((companyId) => ({
+                  preference_id: preference.id,
+                  company_id: companyId,
+                }))
+              );
+            }
+          })
+        );
+      }
+      res.status(200).json(form);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

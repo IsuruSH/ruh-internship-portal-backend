@@ -87,6 +87,7 @@ exports.loginStudent = async (req, res) => {
         email: student.email,
         name: student.first_name,
         student_id: student.student_id,
+        batch: student.academic_year,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
