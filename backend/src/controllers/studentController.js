@@ -1,6 +1,24 @@
 const { Student } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
+const { getStudentResultsByYear } = require("./resultsController");
+
+const deleteFileIfExists = (fileUrl) => {
+  if (!fileUrl) return;
+
+  const filePath = path.join(
+    __dirname,
+    "../../",
+    fileUrl.replace(/^.*\/uploads\//, "uploads/")
+  );
+
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+    console.log(`Deleted old file: ${filePath}`);
+  }
+};
 
 exports.getAllStudents = async (req, res) => {
   console.log(req.user);
@@ -14,12 +32,18 @@ exports.getAllStudents = async (req, res) => {
 
 exports.getStudent = async (req, res) => {
   try {
-    const student = await Student.findByPk(req.params.id, {
-      attributes: ["id", "student_id", "email", "first_login", "academic_year"], // Replace with the attributes you want to send
+    const resstudent = await Student.findByPk(req.params.id, {
+      attributes: {
+        exclude: ["password", "createdAt", "updatedAt", "cvLink"], // Attributes to exclude
+      }, // Replace with the attributes you want to send
     });
-    if (!student) {
+    if (!resstudent) {
       return res.status(404).json({ message: "Student not found" });
     }
+
+    const resultsByYear = await getStudentResultsByYear(resstudent.student_id);
+    const student = resstudent.get({ plain: true });
+    student.resultsByYear = resultsByYear;
 
     res.json(student);
   } catch (error) {
@@ -43,14 +67,53 @@ exports.createStudent = async (req, res) => {
 
 exports.updateStudent = async (req, res) => {
   try {
+    const BASE_URL = process.env.SERVER_URL || "http://localhost:4000";
+
     const student = await Student.findByPk(req.params.id);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
-    await student.update({ ...req.body, first_login: false });
-    res.json(student);
+
+    const dataToUpdate = { ...req.body, first_login: false };
+
+    if (req.files?.profileImage) {
+      const image = req.files.profileImage[0];
+
+      // Delete old profile image
+      if (student.profileImage) {
+        deleteFileIfExists(student.profileImage);
+      }
+
+      dataToUpdate.profileImage = `/uploads/profile/${image.filename}`;
+    }
+
+    if (req.files?.cvLink) {
+      const cv = req.files.cvLink[0];
+
+      if (!cv.mimetype.includes("pdf")) {
+        return res
+          .status(400)
+          .json({ error: "Only PDF files are allowed for CV" });
+      }
+
+      // Delete old CV
+      if (student.cvLink) {
+        deleteFileIfExists(student.cvLink);
+      }
+
+      dataToUpdate.cvLink = `/uploads/cv/${cv.filename}`;
+    }
+
+    await student.update(dataToUpdate);
+
+    res.json({
+      message: "Student updated successfully",
+      profileImage: dataToUpdate.profileImage,
+      cvLink: dataToUpdate.cvLink,
+    });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Upload error:", error);
+    res.status(500).json({ error: "Upload failed", details: error.message });
   }
 };
 

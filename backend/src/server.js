@@ -18,6 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 require("dotenv").config();
+app.use("/uploads/", express.static("uploads"));
 
 // Middleware
 app.use(cookieParser());
@@ -40,7 +41,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/student", validate, studentRoutes);
 app.use("/api/v1/company", companyRoutes);
 app.use("/api/v1/internship", internshipRoutes);
-app.use("/api/v1/preference-form", preferenceFormRoutes);
+app.use("/api/v1/preference-form", validate, preferenceFormRoutes);
 
 // Database connection verification
 async function connectDB() {
