@@ -5,6 +5,7 @@ const {
   PreferenceCompany,
   Company,
   StudentPreference,
+  Student,
 } = require("../models");
 
 module.exports = {
@@ -450,7 +451,6 @@ module.exports = {
       });
 
       if (!submission) {
-        console.log("No submission found");
         return res.json({ submitted: false });
       }
 
@@ -472,6 +472,110 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error in checkSubmission:", error);
+      res.status(500).json({
+        error: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+      });
+    }
+  },
+
+  // Get all submissions
+  async getAllSubmissions(req, res) {
+    try {
+      const { form_id } = req.query;
+
+      const submissions = await StudentPreference.findAll({
+        where: { form_id },
+        include: [
+          {
+            model: Preference,
+            attributes: ["id", "name"],
+          },
+          {
+            model: Company,
+            attributes: ["id", "name"],
+          },
+          {
+            model: Student, // Include Student model to get student details
+            attributes: [
+              "student_id",
+              "first_name",
+              "last_name",
+              "gpa",
+              "cvLink",
+            ],
+          },
+        ],
+      });
+
+      // Group submissions by student
+      const studentsMap = new Map();
+
+      submissions.forEach((submission) => {
+        const studentId = submission.student_fkid;
+        if (!studentsMap.has(studentId)) {
+          const student = submission.Student;
+          studentsMap.set(studentId, {
+            id: studentId,
+            name: `${student.first_name} ${student.last_name}`, // Combine first and last name
+            scNumber: student.student_id, // Use student_id as scNumber
+            gpa: student.gpa,
+            cvLink: student.cvLink,
+            companyIds: [],
+          });
+        }
+        // Push company IDs (avoid duplicates if needed)
+        if (submission.company_id) {
+          studentsMap.get(studentId).companyIds.push(submission.company_id);
+        }
+      });
+
+      // Convert Map to array
+      const initialStudents = Array.from(studentsMap.values());
+
+      res.json({ initialStudents });
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+      res.status(500).json({
+        error: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+      });
+    }
+  },
+
+  async getFormCompanies(req, res) {
+    try {
+      const { form_id } = req.query;
+
+      // Direct query to fetch companies linked to the form_id
+      const companies = await Company.findAll({
+        include: [
+          {
+            model: PreferenceCompany,
+            required: true, // Ensures INNER JOIN (only companies with preferences)
+            include: [
+              {
+                model: Preference,
+                where: { form_id }, // Filter by the given form_id
+                attributes: [], // Exclude Preference fields from results
+              },
+            ],
+            attributes: [], // Exclude PreferenceCompany fields from results
+          },
+        ],
+        attributes: ["id", "name", "email"], // Only return these company fields
+      });
+
+      // Format the result to match your desired structure
+      const initialCompanies = companies.map((company) => ({
+        id: company.id,
+        name: company.name,
+        email: company.email,
+      }));
+
+      res.json({ initialCompanies });
+    } catch (error) {
+      console.error("Error fetching companies:", error);
       res.status(500).json({
         error: error.message,
         stack: process.env.NODE_ENV === "development" ? error.stack : undefined,

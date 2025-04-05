@@ -55,7 +55,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      resultSheet: {
+      cvLink: {
         type: DataTypes.STRING,
         allowNull: true,
       },

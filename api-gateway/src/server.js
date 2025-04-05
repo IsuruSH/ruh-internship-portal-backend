@@ -30,7 +30,6 @@ app.use(
 );
 app.use(express.json());
 
-// Auth routes (login, register)
 app.get("/", (req, res) => {
   res.json({ status: "Hello world" });
 });

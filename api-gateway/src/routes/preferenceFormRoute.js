@@ -39,5 +39,7 @@ router.delete(
 router.post("/:formId/submit", preferenceFormController.submitPreferences);
 
 router.get("/submission/check", preferenceFormController.checkSubmission);
+router.get("/submission/students", preferenceFormController.getAllSubmissions);
+router.get("/submission/companies", preferenceFormController.getFormCompanies);
 
 module.exports = router;
