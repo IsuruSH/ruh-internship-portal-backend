@@ -105,3 +105,67 @@ FROM (
         RAND() AS rand_val  -- Random value between 0-1
     FROM student_subject_combos
 ) AS randomized;
+
+
+
+-- Mock data for companies
+
+-- 1. Cloud Solutions Provider
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('Nimbus Cloud', '120 IT Park, Colombo 05', 'support@nimbuscloud.lk', '+94 11 123 4567', 'Raj Patel', 'Specializes in AWS/GCP consulting');
+
+-- 2. Cybersecurity Firm
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('Ceylon Secure', '45 Cyber Tower, Kandy', 'security@ceylonsecure.lk', '+94 81 234 5678', 'Nimali Fernando', 'Penetration testing & compliance');
+
+-- 3. AI Startup
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('DeepLanka AI', '78 Innovation Hub, Colombo 01', 'hello@deeplanka.lk', '+94 11 345 6789', 'Kumar Sangakkara', 'Natural language processing tools');
+
+-- 4. IT Outsourcing
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('DevLanka Solutions', '23 Developer Lane, Galle', 'info@devlanka.lk', '+94 91 456 7890', 'Priya Rajapaksa', 'Offshore development team');
+
+-- 5. ERP Software
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('ERP Lanka', '56 Business Ave, Colombo 03', 'sales@erplanka.lk', '+94 11 567 8901', 'Dinesh Perera', 'Custom ERP systems for SMEs');
+
+-- 6. Mobile App Development
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('AppVenture', '34 Startup Street, Negombo', 'contact@appventure.lk', '+94 31 678 9012', 'Samantha Silva', 'Flutter/React Native experts');
+
+-- 7. Data Analytics
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('DataWave', '12 Analytics Plaza, Colombo 08', 'analysis@datawave.lk', '+94 11 789 0123', 'Aravind Weerasekara', 'Big Data & BI solutions');
+
+-- 8. IT Training Academy
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('CodeCamp Lanka', '89 Education Rd, Kurunegala', 'learn@codecamp.lk', '+94 37 890 1234', 'Anjali Rathnayake', 'Coding bootcamps for students');
+
+-- 9. Network Infrastructure
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('NetLink Lanka', '67 Router Circle, Colombo 04', 'support@netlink.lk', '+94 11 901 2345', 'Dilshan Fernando', 'Cisco/Juniper network partners');
+
+-- 10. E-Commerce Platform
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('ShopLanka', '43 Digital Mall, Colombo 02', 'merchants@shoplanka.lk', '+94 11 012 3456', 'Harsha Gomes', 'Local Shopify alternative');
+
+-- 11. IT Hardware Distributor
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('TechGear Lanka', '32 Hardware Zone, Ratmalana', 'sales@techgear.lk', '+94 11 135 2468', 'Farhan Iqbal', 'HP/Dell authorized reseller');
+
+-- 12. Blockchain Solutions
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('BlockLanka', '19 Crypto Lane, Colombo 07', 'info@blocklanka.lk', '+94 11 246 3579', 'Amal De Silva', 'Smart contract development');
+
+-- 13. IT Support (Managed Services)
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('FixIT Lanka', '55 Service Rd, Dehiwala', 'help@fixit.lk', '+94 11 357 4680', 'Nishadi Perera', '24/7 IT helpdesk services');
+
+-- 14. Game Development Studio
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('Pixel Island', '88 Game Dev Park, Mount Lavinia', 'studio@pixelisland.lk', '+94 11 468 5791', 'Ruvindu Peiris', 'Mobile game developers');
+
+-- 15. SaaS Startup
+INSERT INTO companies (name, address, email, phone, person, note)
+VALUES ('Cloudify Lanka', '10 SaaS Boulevard, Colombo 06', 'hello@cloudify.lk', '+94 11 579 6802', 'Sanjay Varma', 'HRM software for local businesses');

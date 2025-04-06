@@ -1,11 +1,12 @@
 <h1>Student CVs from University of Ruhuna</h1>
 <p>Dear {{companyName}},</p>
 
-<p>Please find attached the CVs of the following students:</p>
+<p>Please find attached the CVs of the following students who have been assigned
+  to your company:</p>
 
 <ul>
   {{#each students}}
-    <li>{{name}} ({{scNumber}}) </li>
+    <li>{{name}} ({{student_id}}) </li>
   {{/each}}
 </ul>
 

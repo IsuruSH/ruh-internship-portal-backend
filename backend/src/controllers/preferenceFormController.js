@@ -582,4 +582,18 @@ module.exports = {
       });
     }
   },
+
+  //Get only batch field data from preference form table
+  async getBatch(req, res) {
+    try {
+      const form = await PreferenceForm.findAll({
+        attributes: ["batch"],
+        raw: true, // Ensures only raw data is returned
+      });
+      const batches = form.map((batch) => batch.batch); // Extract batch values into an array
+      res.json(batches);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };

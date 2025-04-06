@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 const { getStudentResultsByYear } = require("./resultsController");
+const { Op } = require("sequelize");
 
 const deleteFileIfExists = (fileUrl) => {
   if (!fileUrl) return;
@@ -59,6 +60,24 @@ exports.getStudent = async (req, res) => {
 
 exports.createStudent = async (req, res) => {
   try {
+    // Check if student with the same email already exists
+    const existingStudent = await Student.findOne({
+      where: {
+        [Op.or]: [
+          { email: req.body.email },
+          { student_id: req.body.student_id },
+        ],
+      },
+    });
+
+    if (existingStudent) {
+      // Determine which field caused the conflict
+      const conflictField =
+        existingStudent.email === req.body.email ? "Email" : "Student ID";
+      return res.status(400).json({
+        message: `${conflictField} already exists`,
+      });
+    }
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     const student = await Student.create({
@@ -144,7 +163,9 @@ exports.loginStudent = async (req, res) => {
     }
     const valid = await bcrypt.compare(req.body.password, student.password);
     if (!valid) {
-      return res.status(401).json({ login: false });
+      return res
+        .status(401)
+        .json({ login: false, message: "Invalid password" });
     }
 
     // Generate JWT Token

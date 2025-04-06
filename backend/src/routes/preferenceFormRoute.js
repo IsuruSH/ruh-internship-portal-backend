@@ -42,4 +42,7 @@ router.get("/submission/check", preferenceFormController.checkSubmission);
 router.get("/submission/students", preferenceFormController.getAllSubmissions);
 router.get("/submission/companies", preferenceFormController.getFormCompanies);
 
+//get batches
+router.get("/batch/batches", preferenceFormController.getBatch);
+
 module.exports = router;
