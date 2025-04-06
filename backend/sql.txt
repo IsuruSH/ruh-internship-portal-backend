@@ -1,0 +1,107 @@
+CREATE TABLE courses (
+    subject_code VARCHAR(10) PRIMARY KEY,
+    subject_name VARCHAR(100) NOT NULL,
+    is_core BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE results_new (
+    result_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id VARCHAR(20) NOT NULL,
+    subject_code VARCHAR(10) NOT NULL,
+    grade VARCHAR(3) NOT NULL,
+    FOREIGN KEY (subject_code) REFERENCES courses(subject_code)
+);
+
+INSERT INTO courses (subject_code, subject_name, is_core) VALUES
+-- Year 1 Semester 1
+('CSC1113', 'Programming Techniques', TRUE),
+('CSC1122', 'Computer Systems I', TRUE),
+('CSC113a', 'Internet Services and Web Development', TRUE),
+('CSC1142', 'System Analysis and Design', TRUE),
+('CSC1153', 'Laboratory Assignments', TRUE),
+('MAT112c', 'Differential Equations', TRUE),
+('MAT113c', 'Introductory Statistics', TRUE),
+
+-- Year 1 Semester 2
+('CSC1213', 'Database Management systems', TRUE),
+('CSC1223', 'Data Structures and algorithms', TRUE),
+('CSC1233', 'Software Engineering', TRUE),
+('CSC1242', 'Object Oriented System Development', TRUE),
+('CSC1251', 'Computer Laboratory', TRUE),
+('MAT121b', 'Algebra', TRUE),
+('MAT122b', 'Calculus', TRUE),
+
+-- Year 2 Semester 1
+('CSC2113', 'Data Communication and Computer Networks', TRUE),
+('CSC2123', 'Object Oriented Programming', TRUE),
+('CSC2133', 'Operating Systems', TRUE),
+('CSC2143', 'Computer Graphics and Image Processing', TRUE),
+
+-- Year 2 Semester 2
+('CSC2213', 'Rapid Application Development', TRUE),
+('CSC2222', 'Computer System II', TRUE),
+('CSC2233', 'Internet Programming', TRUE),
+('CSC2242', 'Advanced Database Management', TRUE),
+('CSC2252', 'Project Management', TRUE),
+('CSC2263', 'Multimedia and Video Production', FALSE),
+('CSC2272', 'Data and Network Security', FALSE),
+
+-- Year 3 Semester 1
+('CSC3113', 'Group Projects', TRUE),
+('CSC3122', 'e-Commerce and Professional Practice', FALSE),
+('CSC3132', 'Data Warehousing and Data mining', FALSE),
+('CSC3133', 'Network and System Administration', FALSE),
+('CSC3142', 'Internet Services and Protocols', FALSE),
+('CSC3152', 'Geographic Information Systems', FALSE),
+('CSC3162', 'Research Methods', FALSE),
+('CSC3172', 'Distributed Systems', FALSE);
+
+
+-- First, ensure grade column exists with proper grading scale
+ALTER TABLE results_new 
+MODIFY COLUMN grade CHAR(2);
+
+-- Generate random results for all students and courses
+INSERT INTO results_new (student_id, subject_code, grade)
+WITH RECURSIVE 
+-- Generate student IDs from SC/2021/12340 to SC/2021/12440
+student_range AS (
+    SELECT 12340 AS student_num
+    UNION ALL
+    SELECT student_num + 1 
+    FROM student_range 
+    WHERE student_num < 12440
+),
+-- Cross join with all courses
+student_subject_combos AS (
+    SELECT 
+        CONCAT('SC/2021/', sr.student_num) AS student_id,
+        s.subject_code
+    FROM student_range sr
+    CROSS JOIN courses s
+    -- Randomly include about 60% of possible combinations
+    WHERE RAND() < 0.6
+)
+-- Assign random grades
+SELECT 
+    student_id,
+    subject_code,
+    CASE 
+        WHEN rand_val >= 0.9 THEN 'A+'
+        WHEN rand_val >= 0.8 THEN 'A'
+        WHEN rand_val >= 0.7 THEN 'A-'
+        WHEN rand_val >= 0.6 THEN 'B+'
+        WHEN rand_val >= 0.5 THEN 'B'
+        WHEN rand_val >= 0.4 THEN 'B-'
+        WHEN rand_val >= 0.3 THEN 'C+'
+        WHEN rand_val >= 0.2 THEN 'C'
+        WHEN rand_val >= 0.1 THEN 'D'
+        ELSE 'F'
+    END AS grade
+FROM (
+    SELECT 
+        student_id,
+        subject_code,
+        RAND() AS rand_val  -- Random value between 0-1
+    FROM student_subject_combos
+) AS randomized;

@@ -34,14 +34,20 @@ exports.getStudent = async (req, res) => {
   try {
     const resstudent = await Student.findByPk(req.params.id, {
       attributes: {
-        exclude: ["password", "createdAt", "updatedAt", "cvLink"], // Attributes to exclude
+        exclude: ["password", "createdAt", "updatedAt"], // Attributes to exclude
       }, // Replace with the attributes you want to send
     });
     if (!resstudent) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    const resultsByYear = await getStudentResultsByYear(resstudent.student_id);
+    let resultsByYear;
+    try {
+      resultsByYear = await getStudentResultsByYear(resstudent.student_id);
+    } catch (error) {
+      console.error("Error fetching results by year:", error);
+      resultsByYear = [];
+    }
     const student = resstudent.get({ plain: true });
     student.resultsByYear = resultsByYear;
 
@@ -67,8 +73,6 @@ exports.createStudent = async (req, res) => {
 
 exports.updateStudent = async (req, res) => {
   try {
-    const BASE_URL = process.env.SERVER_URL || "http://localhost:4000";
-
     const student = await Student.findByPk(req.params.id);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });

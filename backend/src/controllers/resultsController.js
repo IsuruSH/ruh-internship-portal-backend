@@ -15,8 +15,8 @@ exports.getStudentResultsByYear = async (student_id) => {
         s.subject_code,
         s.subject_name,
         s.is_core
-      FROM results r
-      JOIN subjects s ON r.subject_code = s.subject_code
+      FROM results_new r
+      JOIN courses s ON r.subject_code = s.subject_code
       WHERE r.student_id = ?
       ORDER BY s.subject_code ASC
     `,
