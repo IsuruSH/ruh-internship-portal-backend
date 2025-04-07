@@ -28,6 +28,17 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  if (file.fieldname === "cvLink") {
+    // Now file.buffer will be available
+    cb(null, true);
+  } else if (file.fieldname === "profileImage") {
+    cb(null, true);
+  } else {
+    cb(new Error("Invalid fieldname"), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
 
 module.exports = upload;

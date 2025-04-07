@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const { getStudentResultsByYear } = require("./resultsController");
 const { Op } = require("sequelize");
+const CVParser = require("../services/cvParser");
 
 const deleteFileIfExists = (fileUrl) => {
   if (!fileUrl) return;
@@ -112,6 +113,18 @@ exports.updateStudent = async (req, res) => {
 
     if (req.files?.cvLink) {
       const cv = req.files.cvLink[0];
+
+      console.log("CV file:", cv);
+
+      const fileBuffer = fs.readFileSync(cv.path);
+      console.log("File buffer:", fileBuffer);
+
+      const text = await CVParser.extractTextFromBuffer(
+        fileBuffer,
+        cv.originalname
+      );
+      const cleanedText = CVParser.cleanText(text);
+      console.log("Extracted text:", cleanedText);
 
       if (!cv.mimetype.includes("pdf")) {
         return res
