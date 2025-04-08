@@ -36,7 +36,7 @@ exports.getStudent = async (req, res) => {
   try {
     const resstudent = await Student.findByPk(req.params.id, {
       attributes: {
-        exclude: ["password", "createdAt", "updatedAt"], // Attributes to exclude
+        exclude: ["password", "updatedAt"], // Attributes to exclude
       }, // Replace with the attributes you want to send
     });
     if (!resstudent) {

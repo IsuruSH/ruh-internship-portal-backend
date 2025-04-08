@@ -77,7 +77,7 @@ module.exports = (sequelize) => {
     Student.hasOne(models.CompanySupervisor, {
       foreignKey: "student_id",
     });
-    Student.hasOne(models.InternshipStatus, {
+    Student.hasMany(models.InternshipStatus, {
       foreignKey: "student_id",
     });
   };

@@ -16,6 +16,7 @@ const preferenceFormRoutes = require("./routes/preferenceFormRoute");
 const sendEmailRoutes = require("./routes/email");
 const statusRoutes = require("./routes/statusRoutes");
 const statsRoutes = require("./routes/statsRoutes");
+const noticeRoutes = require("./routes/noticeRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -48,6 +49,7 @@ app.use("/api/v1/preference-form", validate, preferenceFormRoutes);
 app.use("/api/v1/email", sendEmailRoutes);
 app.use("/api/v1/status", statusRoutes);
 app.use("/api/v1/stats", statsRoutes);
+app.use("/api/v1/notices", noticeRoutes);
 
 // Database connection verification
 async function connectDB() {

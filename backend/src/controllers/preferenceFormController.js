@@ -6,6 +6,7 @@ const {
   Company,
   StudentPreference,
   Student,
+  Notice,
 } = require("../models");
 
 module.exports = {
@@ -18,6 +19,17 @@ module.exports = {
         batch,
         instructions,
         deadline,
+      });
+
+      const notice = await Notice.create({
+        topic: `New Preference Form Available - Batch ${batch}`,
+        content: `A new company preference form has been published for batch ${batch}. 
+                 Please submit your preferences before ${new Date(
+                   deadline
+                 ).toLocaleDateString()}. 
+                 ${instructions ? "Instructions: " + instructions : ""}`,
+        isImportant: true, // Mark as important
+        expiresAt: deadline, // Notice will expire when preferences are due
       });
 
       if (preferences && preferences.length > 0) {

@@ -13,6 +13,7 @@ const Student = require("./Student");
 const StudentCVText = require("./StudentCVText");
 const InternshipStatus = require("./InternshipStatus");
 const CompanySupervisor = require("./CompanySupervisor");
+const Notice = require("./Notice");
 
 // Initialize models
 const models = {
@@ -26,6 +27,7 @@ const models = {
   StudentCVText: StudentCVText(sequelize),
   InternshipStatus: InternshipStatus(sequelize),
   CompanySupervisor: CompanySupervisor(sequelize),
+  Notice: Notice(sequelize),
 };
 
 // Set up associations
