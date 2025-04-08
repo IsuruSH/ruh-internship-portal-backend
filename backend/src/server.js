@@ -14,6 +14,7 @@ const companyRoutes = require("./routes/companyRoutes");
 const internshipRoutes = require("./routes/internshipRoutes");
 const preferenceFormRoutes = require("./routes/preferenceFormRoute");
 const sendEmailRoutes = require("./routes/email");
+const statusRoutes = require("./routes/statusRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -44,6 +45,7 @@ app.use("/api/v1/company", companyRoutes);
 app.use("/api/v1/internship", internshipRoutes);
 app.use("/api/v1/preference-form", validate, preferenceFormRoutes);
 app.use("/api/v1/email", sendEmailRoutes);
+app.use("/api/v1/status", statusRoutes);
 
 // Database connection verification
 async function connectDB() {

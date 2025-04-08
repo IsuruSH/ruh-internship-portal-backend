@@ -71,7 +71,13 @@ module.exports = (sequelize) => {
     Student.hasMany(models.StudentPreference, {
       foreignKey: "student_fkid",
     });
-    Student.hasMany(models.StudentCVText, {
+    Student.hasOne(models.StudentCVText, {
+      foreignKey: "student_id",
+    });
+    Student.hasOne(models.CompanySupervisor, {
+      foreignKey: "student_id",
+    });
+    Student.hasOne(models.InternshipStatus, {
       foreignKey: "student_id",
     });
   };
