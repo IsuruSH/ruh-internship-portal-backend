@@ -1,4 +1,4 @@
-const { Student } = require("../models");
+const { Student, StudentCVText } = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -50,11 +50,67 @@ exports.getStudent = async (req, res) => {
       console.error("Error fetching results by year:", error);
       resultsByYear = [];
     }
+
     const student = resstudent.get({ plain: true });
     student.resultsByYear = resultsByYear;
 
     res.json(student);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getStudentRecommendations = async (req, res) => {
+  try {
+    const resstudent = await Student.findByPk(req.params.id, {
+      attributes: ["id", "student_id"], // only what you need
+    });
+
+    if (!resstudent) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    let resultsByYear;
+    try {
+      resultsByYear = await getStudentResultsByYear(resstudent.student_id);
+    } catch (error) {
+      console.error("Error fetching results by year:", error);
+      resultsByYear = [];
+    }
+
+    const cvText = await StudentCVText.findOne({
+      where: { student_id: resstudent.id },
+    });
+
+    const student = resstudent.get({ plain: true });
+
+    if (cvText?.text) {
+      try {
+        const recommendationResponse = await fetch(
+          `${process.env.RECOMMENDATION_SERVER_URL}/recommend`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              resultsByYear: resultsByYear,
+              cv_text: cvText.text,
+            }),
+          }
+        );
+
+        const recommendationData = await recommendationResponse.json();
+        student.recommendations = recommendationData;
+      } catch (apiError) {
+        console.error("Recommendation API error:", apiError);
+        student.recommendations = null;
+      }
+    } else {
+      student.recommendations = null;
+    }
+
+    res.json(student);
+  } catch (error) {
+    console.error("Error fetching student recommendations:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -93,7 +149,8 @@ exports.createStudent = async (req, res) => {
 
 exports.updateStudent = async (req, res) => {
   try {
-    const student = await Student.findByPk(req.params.id);
+    const st_id = req.params.id;
+    const student = await Student.findByPk(st_id);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
@@ -114,22 +171,38 @@ exports.updateStudent = async (req, res) => {
     if (req.files?.cvLink) {
       const cv = req.files.cvLink[0];
 
-      console.log("CV file:", cv);
+      if (!cv.mimetype.includes("pdf")) {
+        return res
+          .status(400)
+          .json({ error: "Only PDF files are allowed for CV" });
+      }
 
       const fileBuffer = fs.readFileSync(cv.path);
-      console.log("File buffer:", fileBuffer);
-
       const text = await CVParser.extractTextFromBuffer(
         fileBuffer,
         cv.originalname
       );
       const cleanedText = CVParser.cleanText(text);
-      console.log("Extracted text:", cleanedText);
 
-      if (!cv.mimetype.includes("pdf")) {
-        return res
-          .status(400)
-          .json({ error: "Only PDF files are allowed for CV" });
+      // Check if CV text already exists for this student
+      const existingCVText = await StudentCVText.findOne({
+        where: { student_id: st_id },
+      });
+
+      if (existingCVText) {
+        // Update existing record
+        await existingCVText.update({
+          text: cleanedText,
+          updatedAt: new Date(), // Ensure updatedAt is refreshed
+        });
+        console.log("Updated existing CV text record");
+      } else {
+        // Create new record
+        await StudentCVText.create({
+          student_id: st_id,
+          text: cleanedText,
+        });
+        console.log("Created new CV text record");
       }
 
       // Delete old CV

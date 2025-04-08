@@ -3,7 +3,6 @@ const router = express.Router();
 const upload = require("../middleware/multer");
 
 const studentController = require("../controllers/studentController");
-const resultsController = require("../controllers/resultsController");
 
 router.get("/", studentController.getAllStudents);
 router.get("/:id", studentController.getStudent);
@@ -17,5 +16,6 @@ router.put(
   studentController.updateStudent
 );
 router.delete("/:id", studentController.deleteStudent);
+router.get("/recommend/:id", studentController.getStudentRecommendations);
 
 module.exports = router;

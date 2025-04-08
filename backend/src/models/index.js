@@ -10,6 +10,7 @@ const PreferenceCompany = require("./PreferenceCompany");
 const PreferenceForm = require("./PreferenceForm");
 const StudentPreference = require("./StudentPreference");
 const Student = require("./Student");
+const StudentCVText = require("./StudentCVText");
 
 // Initialize models
 const models = {
@@ -20,6 +21,7 @@ const models = {
   PreferenceForm: PreferenceForm(sequelize),
   StudentPreference: StudentPreference(sequelize),
   Student: Student(sequelize),
+  StudentCVText: StudentCVText(sequelize),
 };
 
 // Set up associations

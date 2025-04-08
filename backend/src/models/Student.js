@@ -71,6 +71,9 @@ module.exports = (sequelize) => {
     Student.hasMany(models.StudentPreference, {
       foreignKey: "student_fkid",
     });
+    Student.hasMany(models.StudentCVText, {
+      foreignKey: "student_id",
+    });
   };
 
   return Student;

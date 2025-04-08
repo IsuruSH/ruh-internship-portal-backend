@@ -189,6 +189,42 @@ CAREER_PATHS = {
         "related_subjects": ["Internet Services and Web Development", "Multimedia and Video Production", "System Analyst & Design"],
         "tools": ["figma", "adobe xd", "sketch"],
         "boosters": ["design portfolio", "user study"]
+    },
+    "Business Analyst": {
+        "required_skills": {
+            "requirements analysis": 0.95,
+            "stakeholder management": 0.9,
+            "data analysis": 0.85,
+            "process modeling": 0.85,
+            "business acumen": 0.9
+        },
+        "related_subjects": ["E-commerce and Professional Practice", "Database Management Systems", "System Analyst & Design"],
+        "tools": ["excel", "power bi", "sql", "jira"],
+        "boosters": ["business case study", "requirements document"]
+    },
+    "Project Manager": {
+        "required_skills": {
+            "project planning": 0.95,
+            "risk management": 0.9,
+            "team leadership": 0.9,
+            "budgeting": 0.85,
+            "agile methodologies": 0.9
+        },
+        "related_subjects": ["Project Management", "System Analyst & Design", "Group Projects"],
+        "tools": ["microsoft project", "jira", "trello", "asana"],
+        "boosters": ["pmp certification", "successful project delivery"]
+    },
+    "Quality Assurance Engineer": {
+        "required_skills": {
+            "test planning": 0.95,
+            "test automation": 0.9,
+            "bug tracking": 0.9,
+            "regression testing": 0.85,
+            "performance testing": 0.85
+        },
+        "related_subjects": ["Software Engineering", "System Analyst & Design", "Project Management"],
+        "tools": ["selenium", "jira", "postman", "testrail"],
+        "boosters": ["test coverage report", "automation framework"]
     }
 }
 
