@@ -6,7 +6,7 @@ const statusController = require("../controllers/statusController");
 router.get("/:id", statusController.getStudentStatus);
 
 // Get only current status
-router.get("/current", statusController.getCurrentStatus);
+router.get("/current/:id", statusController.getCurrentStatus);
 
 // Add new status
 router.post("/", statusController.addStatus);

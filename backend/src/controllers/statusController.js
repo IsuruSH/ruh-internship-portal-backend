@@ -65,7 +65,7 @@ exports.addStatus = async (req, res) => {
 // Get current status (latest)
 exports.getCurrentStatus = async (req, res) => {
   try {
-    const studentId = req.user.student_id;
+    const studentId = req.params.id;
 
     const currentStatus = await InternshipStatus.findOne({
       where: { student_id: studentId },
